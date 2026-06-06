@@ -36,7 +36,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $name!",
         modifier = modifier,
-        color = Color(0xFF5E113) // TANIM YANLIŞ.
     )
 }
 
