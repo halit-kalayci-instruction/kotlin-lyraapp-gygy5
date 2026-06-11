@@ -18,6 +18,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.turkcell.lyraapp.ui.auth.login.LoginRoute
 import com.turkcell.lyraapp.ui.auth.register.RegisterRoute
+import com.turkcell.lyraapp.ui.home.HomeRoute
 
 /**
  * Uygulamanın iskelet navigasyon yapısı.
@@ -84,7 +85,7 @@ fun LyraNavHost(
                 )
             }
 
-            composable(LyraDestination.Home.route) { PlaceholderScreen(title = "Ana sayfa") }
+            composable(LyraDestination.Home.route) { HomeRoute() }
             composable(LyraDestination.Search.route) { PlaceholderScreen(title = "Ara") }
             composable(LyraDestination.Library.route) { PlaceholderScreen(title = "Kütüphane") }
             composable(LyraDestination.Favorites.route) { PlaceholderScreen(title = "Favoriler") }

@@ -28,3 +28,4 @@ interface AuthRepository {
         password: String,
     ): Result<Unit>
 }
+
