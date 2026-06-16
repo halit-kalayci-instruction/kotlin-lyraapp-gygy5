@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.turkcell.lyraapp.data.home.HomeSong
 import com.turkcell.lyraapp.data.home.PlaylistForYou
 import com.turkcell.lyraapp.data.home.QuickPick
 import com.turkcell.lyraapp.data.home.RecentlyPlayed
@@ -125,6 +126,10 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 item { HomeHeader(greeting = state.greeting, userInitials = state.userInitials) }
+                item { SectionHeader(title = "Şarkılar") }
+                items(state.songs, key = { it.id }) { song ->
+                    SongRow(song = song)
+                }
                 item { QuickPickGrid(quickPicks = state.quickPicks) }
                 item { SectionHeader(title = "Son çalınanlar", trailingText = "Tümü") }
                 item { RecentlyPlayedRow(items = state.recentlyPlayed) }
@@ -273,6 +278,46 @@ private fun SectionHeader(
     }
 }
 
+/**
+ * API'dan gelen tek bir şarkı satırı: küçük gradyan kapak + başlık ve sanatçı.
+ *
+ * Bu fazda satır davranışsızdır (tıklama/oynatma sonraki faza bırakılmıştır).
+ */
+@Composable
+private fun SongRow(song: HomeSong) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Artwork(
+            startColor = song.artworkStartColor,
+            endColor = song.artworkEndColor,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(10.dp)),
+        )
+        Column(modifier = Modifier.padding(start = 12.dp)) {
+            Text(
+                text = song.title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = song.artist,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
 /** "Son çalınanlar" yatay scrollable kart listesi. */
 @Composable
 private fun RecentlyPlayedRow(items: List<RecentlyPlayed>) {
@@ -365,6 +410,11 @@ private fun Artwork(
 private val previewState = HomeUiState(
     greeting = "İyi akşamlar",
     userInitials = "ZK",
+    songs = listOf(
+        HomeSong("s_neon-tide", "Neon Tide", "Aurora Drift", 0xFF8B6FB8, 0xFF4A3D6B),
+        HomeSong("s_city-lights", "City Lights", "Aurora Drift", 0xFF4AC2A8, 0xFF1F6E5C),
+        HomeSong("s_polaris", "Polaris", "Stardust", 0xFFD98E4A, 0xFF8A5526),
+    ),
     quickPicks = listOf(
         QuickPick("qp-1", "Gece Sürüşü", 0xFF8B6FB8, 0xFF4A3D6B),
         QuickPick("qp-2", "Sabah Kahvesi", 0xFF7C83D9, 0xFF3E4486),

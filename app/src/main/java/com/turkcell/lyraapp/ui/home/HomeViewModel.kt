@@ -54,6 +54,7 @@ class HomeViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             userInitials = feed.userInitials,
+                            songs = feed.songs,
                             quickPicks = feed.quickPicks,
                             recentlyPlayed = feed.recentlyPlayed,
                             playlistsForYou = feed.playlistsForYou,
