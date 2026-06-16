@@ -1,6 +1,7 @@
 package com.turkcell.lyraapp.data.songs
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
@@ -24,4 +25,14 @@ interface SongsApi {
         @Query("cursor") cursor: String? = null,
         @Query("q") query: String? = null,
     ): SongsPageDto
+
+    /**
+     * Bir şarkı için kısa ömürlü, imzalı stream URL'si üretir (TTL ~300sn).
+     *
+     * Dönen [StreamUrlEnvelope.data] içindeki `url` doğrudan ExoPlayer'a verilir; Range
+     * isteklerini desteklediğinden seek (ilerletme/geri alma) çalışır. URL listeyle birlikte
+     * önbelleğe alınmamalı, oynatmadan hemen önce alınmalıdır (bkz. openapi.json /stream-url).
+     */
+    @GET("api/v1/songs/{id}/stream-url")
+    suspend fun getStreamUrl(@Path("id") id: String): StreamUrlEnvelope
 }

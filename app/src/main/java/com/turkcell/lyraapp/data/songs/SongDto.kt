@@ -29,3 +29,22 @@ data class SongDto(
     val artist: String,
     val album: String? = null,
 )
+
+/**
+ * `GET /api/v1/songs/{id}/stream-url` yanıtının zarfı; yük [data] içindedir.
+ */
+@Serializable
+data class StreamUrlEnvelope(
+    val data: StreamUrlDto,
+)
+
+/**
+ * İmzalı stream URL yükü. Yalnızca [url] oynatma için zorunludur; [expiresAt] ve [mimeType]
+ * bilgilendirme amaçlıdır (bu fazda kullanılmaz).
+ */
+@Serializable
+data class StreamUrlDto(
+    val url: String,
+    val expiresAt: String? = null,
+    val mimeType: String? = null,
+)

@@ -1,6 +1,7 @@
 package com.turkcell.lyraapp.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +60,7 @@ import com.turkcell.lyraapp.ui.theme.LyraAppTheme
  */
 @Composable
 fun HomeRoute(
+    onSongClick: (songId: String, title: String, artist: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -77,6 +79,9 @@ fun HomeRoute(
                         viewModel.onIntent(HomeIntent.Retry)
                     }
                 }
+
+                is HomeEffect.NavigateToPlayer ->
+                    onSongClick(effect.songId, effect.title, effect.artist)
             }
         }
     }
@@ -128,7 +133,10 @@ fun HomeScreen(
                 item { HomeHeader(greeting = state.greeting, userInitials = state.userInitials) }
                 item { SectionHeader(title = "Şarkılar") }
                 items(state.songs, key = { it.id }) { song ->
-                    SongRow(song = song)
+                    SongRow(
+                        song = song,
+                        onClick = { onIntent(HomeIntent.SongSelected(song)) },
+                    )
                 }
                 item { QuickPickGrid(quickPicks = state.quickPicks) }
                 item { SectionHeader(title = "Son çalınanlar", trailingText = "Tümü") }
@@ -281,13 +289,17 @@ private fun SectionHeader(
 /**
  * API'dan gelen tek bir şarkı satırı: küçük gradyan kapak + başlık ve sanatçı.
  *
- * Bu fazda satır davranışsızdır (tıklama/oynatma sonraki faza bırakılmıştır).
+ * Satıra tıklanınca [onClick] tetiklenir ve oynatıcı ekranına gidilir.
  */
 @Composable
-private fun SongRow(song: HomeSong) {
+private fun SongRow(
+    song: HomeSong,
+    onClick: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

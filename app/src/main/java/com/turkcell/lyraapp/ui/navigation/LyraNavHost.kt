@@ -9,16 +9,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import android.net.Uri
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.turkcell.lyraapp.ui.auth.login.LoginRoute
 import com.turkcell.lyraapp.ui.auth.register.RegisterRoute
 import com.turkcell.lyraapp.ui.home.HomeRoute
+import com.turkcell.lyraapp.ui.player.PlayerRoute
+import com.turkcell.lyraapp.ui.player.PlayerViewModel
 
 /**
  * Uygulamanın iskelet navigasyon yapısı.
@@ -85,14 +90,55 @@ fun LyraNavHost(
                 )
             }
 
-            composable(LyraDestination.Home.route) { HomeRoute() }
+            composable(LyraDestination.Home.route) {
+                HomeRoute(
+                    onSongClick = { songId, title, artist ->
+                        navController.navigate(playerRoute(songId, title, artist))
+                    },
+                )
+            }
             composable(LyraDestination.Search.route) { PlaceholderScreen(title = "Ara") }
             composable(LyraDestination.Library.route) { PlaceholderScreen(title = "Kütüphane") }
             composable(LyraDestination.Favorites.route) { PlaceholderScreen(title = "Favoriler") }
             composable(LyraDestination.Profile.route) { PlaceholderScreen(title = "Profil") }
+
+            composable(
+                route = PLAYER_ROUTE_PATTERN,
+                arguments = listOf(
+                    navArgument(PlayerViewModel.ARG_SONG_ID) { type = NavType.StringType },
+                    navArgument(PlayerViewModel.ARG_TITLE) {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                    navArgument(PlayerViewModel.ARG_ARTIST) {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                ),
+            ) {
+                PlayerRoute(onNavigateBack = { navController.popBackStack() })
+            }
         }
     }
 }
+
+/**
+ * Oynatıcı route deseni: şarkı kimliği yol parametresi, başlık/sanatçı opsiyonel query
+ * parametresidir. ViewModel argümanları [PlayerViewModel.ARG_*] ile bu desenden çözer.
+ */
+private const val PLAYER_ROUTE_PATTERN =
+    "player/{${PlayerViewModel.ARG_SONG_ID}}?" +
+        "${PlayerViewModel.ARG_TITLE}={${PlayerViewModel.ARG_TITLE}}&" +
+        "${PlayerViewModel.ARG_ARTIST}={${PlayerViewModel.ARG_ARTIST}}"
+
+/**
+ * Bir şarkı için gerçek oynatıcı yolunu üretir. Tüm bileşenler URL-encode edilir; böylece
+ * boşluk/özel karakter içeren başlık ve sanatçı adları route'u bozmaz.
+ */
+private fun playerRoute(songId: String, title: String, artist: String): String =
+    "player/${Uri.encode(songId)}?" +
+        "${PlayerViewModel.ARG_TITLE}=${Uri.encode(title)}&" +
+        "${PlayerViewModel.ARG_ARTIST}=${Uri.encode(artist)}"
 
 /**
  * Alt çubuk sekmesine standart desenle geçiş yapar: back stack'te sekme kopyası birikmez

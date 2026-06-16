@@ -40,6 +40,15 @@ class HomeViewModel @Inject constructor(
     fun onIntent(intent: HomeIntent) {
         when (intent) {
             is HomeIntent.Retry -> loadFeed()
+            is HomeIntent.SongSelected -> viewModelScope.launch {
+                _effect.send(
+                    HomeEffect.NavigateToPlayer(
+                        songId = intent.song.id,
+                        title = intent.song.title,
+                        artist = intent.song.artist,
+                    ),
+                )
+            }
         }
     }
 
